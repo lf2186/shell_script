@@ -31,10 +31,12 @@ function get_startapplist(){
 	local dapps=$(ps -ef | grep -E 'nginx|java|php' | grep -v grep)
 	nginxsbin=$(echo ${dapps} | sed 's/.*master process \([0-9a-z\/]\{1,\}nginx\).*/\1/')
 	tomcatdir=$(echo ${dapps} | sed 's/.*Dcatalina.home=\([0-9a-z\/]\{1,\}\).*/\1/')
-	#nginx_version=$(nginx -v)
-	#echo "$hostname : nginx_version : $nginx_version"
-	echo "$hostname : tomcat : $tomcatdir"
-	#echo $nginx_version
+	nginx_version=$($nginxsbin -v 2>&1 | awk -F: '{print $2}')
+	tomcat_version=$($tomcatdir/bin/version.sh | awk '/Server version/{print $4}')
+	java_version=$($tomcatdir/bin/version.sh | awk '/JVM Version/{print $3}')
+	[ -n $nginx_version ] && echo "$hostname : nginx_version : $nginx_version"
+	[ -n $tomcat_version ] && echo "$hostname : tomcat_version : $tomcat_version"
+	[ -n $java_version ] && echo "$hostname : java_version : $java_version"
 }
 
 get_startapplist
